@@ -1,0 +1,15 @@
+{
+  "timezone": "America/New_York",
+  "device": { "host": "127.0.0.1", "port": 8060 },
+  "discovery": { "subnetScan": false },
+  "monitor": { "pollIntervalSec": 2, "restrictionProbeIntervalSec": 10 },
+  "rules": {
+    "appPolicy": { "mode": "blocklist", "apps": ["837", "2285"] },
+    "appBudgets": { "44444": 2 },
+    "globalBudget": { "weekday": 120, "weekend": 180 },
+    "quietHours": ["22:00-06:00"]
+  },
+  "enforcement": { "mode": "enforce" },
+  "database": { "path": "data/mock.db" },
+  "log": { "level": "info", "file": "logs/mock.log" }
+}

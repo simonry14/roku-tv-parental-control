@@ -1,0 +1,44 @@
+name: Something isn't working
+description: The installer, the dashboard or the TV didn't do what you expected.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this. Please don't include your PIN or your TV's developer password.
+        The README's **Troubleshooting** section answers the most common questions.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: messages
+    attributes:
+      label: Messages
+      description: Copy anything the installer window or the dashboard showed. You can drag a screenshot here too.
+  - type: input
+    id: tv
+    attributes:
+      label: TV
+      description: Brand and model, and the Roku OS version (on the TV, Settings → System → About).
+      placeholder: Hisense 65R6, Roku OS 14.1.4
+  - type: input
+    id: windows
+    attributes:
+      label: Windows
+      description: Windows 10 or 11? Laptop or desktop?
+  - type: input
+    id: version
+    attributes:
+      label: Roku TV Parental Control version
+      description: Shown at the top of the installer window.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log files (optional)
+      description: |
+        For start-up problems, attach C:\RokuTVParentalControl\logs\service\launcher.log and the newest
+        logs\roku-guardian*.log file from the same folder.

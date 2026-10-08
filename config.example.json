@@ -1,0 +1,54 @@
+{
+  "timezone": "America/New_York",
+  "device": {
+    "serial": "",
+    "host": "",
+    "port": 8060
+  },
+  "discovery": {
+    "ssdpTimeoutMs": 3000,
+    "subnetScan": true
+  },
+  "monitor": {
+    "pollIntervalSec": 5,
+    "restrictionProbeIntervalSec": 60
+  },
+  "usage": {
+    "excludeAppIds": ["dev"]
+  },
+  "rules": {
+    "appPolicy": { "mode": "blocklist", "apps": [] },
+    "appBudgets": {},
+    "globalBudget": { "weekday": 120, "weekend": 180 },
+    "viewingWindows": {
+      "weekdays": ["15:30-19:30"],
+      "weekends": ["08:00-20:00"]
+    },
+    "quietHours": ["20:30-07:00"],
+    "exemptApps": ["dev"]
+  },
+  "enforcement": {
+    "mode": "dry-run",
+    "cooldownSec": 10,
+    "powerOffCooldownSec": 15,
+    "escalation": { "repeats": 3, "windowMin": 5 }
+  },
+  "tvMessages": {
+    "enabled": true,
+    "countdownSec": 30,
+    "warnBeforeMin": 0
+  },
+  "database": {
+    "path": "data/roku-guardian.db"
+  },
+  "backup": {
+    "enabled": true,
+    "time": "03:30",
+    "keep": 7
+  },
+  "log": {
+    "level": "info",
+    "file": "logs/roku-guardian.log",
+    "keepDays": 14
+  }
+}

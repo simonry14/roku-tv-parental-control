@@ -1,0 +1,6 @@
+dist/
+node_modules/
+data/
+logs/
+package-lock.json
+web/dist/

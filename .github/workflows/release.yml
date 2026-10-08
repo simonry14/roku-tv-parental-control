@@ -1,0 +1,94 @@
+name: Release
+
+# Push a tag like v1.2.3 to build the Windows download and attach it to a draft release.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows-zip:
+    name: Windows download
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build
+
+      - name: The tag matches package.json
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          if ("v$version" -ne $env:GITHUB_REF_NAME) { throw "package.json says $version but the tag is $env:GITHUB_REF_NAME." }
+
+      - name: Keep only what the app needs to run
+        run: npm prune --omit=dev
+
+      - name: Add the Windows on ARM password-hashing library
+        # npm installs only this runner's (x64) build of @node-rs/argon2; better-sqlite3 already ships both.
+        shell: pwsh
+        run: |
+          $argon = Get-Content node_modules\@node-rs\argon2\package.json -Raw | ConvertFrom-Json
+          $name = '@node-rs/argon2-win32-arm64-msvc'
+          $version = $argon.optionalDependencies.$name
+          if (-not $version) { throw "@node-rs/argon2 no longer lists $name." }
+          $tgz = npm pack "$name@$version" --silent
+          $dest = 'node_modules\@node-rs\argon2-win32-arm64-msvc'
+          New-Item -ItemType Directory -Force $dest | Out-Null
+          tar -xzf $tgz -C $dest --strip-components=1
+          Remove-Item $tgz
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $out = Join-Path $env:RUNNER_TEMP 'package'
+          New-Item -ItemType Directory -Force $out | Out-Null
+          foreach ($file in 'Install.cmd', 'Uninstall.cmd', 'README.md', 'LICENSE', 'package.json', 'package-lock.json', '.npmrc', 'config.example.json', '.env.example') {
+            Copy-Item $file $out
+          }
+          New-Item -ItemType Directory -Force (Join-Path $out 'service') | Out-Null
+          Copy-Item service\launcher.mjs (Join-Path $out 'service')
+          foreach ($dir in 'dist', 'node_modules', 'scripts', 'web\dist') {
+            robocopy $dir (Join-Path $out $dir) /E /NFL /NDL /NJH /NJS /NP | Out-Null
+            if ($LASTEXITCODE -ge 8) { throw "Copying $dir failed ($LASTEXITCODE)." }
+          }
+          robocopy roku-channel (Join-Path $out 'roku-channel') /E /XD out art /NFL /NDL /NJH /NJS /NP | Out-Null
+          if ($LASTEXITCODE -ge 8) { throw "Copying roku-channel failed ($LASTEXITCODE)." }
+          # Tells Install.cmd that this download is ready to run (no npm install or build needed).
+          Set-Content -Path (Join-Path $out 'RELEASE') -Value "Roku TV Parental Control $version" -Encoding ASCII
+          $zip = Join-Path $env:GITHUB_WORKSPACE 'Roku-TV-Parental-Control-Windows.zip'
+          Push-Location $out
+          7z a -tzip -mx=7 $zip * | Out-Null
+          Pop-Location
+          if ($LASTEXITCODE -ne 0) { throw "Zipping failed ($LASTEXITCODE)." }
+          Write-Host ("Packaged {0}: {1:N1} MB" -f $version, ((Get-Item $zip).Length / 1MB))
+          $global:LASTEXITCODE = 0
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Roku-TV-Parental-Control-Windows
+          path: Roku-TV-Parental-Control-Windows.zip
+
+      - name: Draft the release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          name: Roku TV Parental Control ${{ github.ref_name }}
+          generate_release_notes: true
+          files: Roku-TV-Parental-Control-Windows.zip
+          body: |
+            **To install:** download **Roku-TV-Parental-Control-Windows.zip** below, extract it, and double-click **Install**. The [README](https://github.com/${{ github.repository }}#install-it-about-15-minutes) walks through every step.
+
+            **To update:** do the same. Your rules, PIN and history are kept.

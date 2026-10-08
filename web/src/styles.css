@@ -1,0 +1,153 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/rubik';
+
+/*
+ * Roku Guardian — "living room at dusk".
+ * Midnight surfaces, one dusk-violet accent for actions, status colours reserved for TV health.
+ * The TV screen is the one loud element; it stays dark glass in both themes, like a real screen.
+ */
+:root {
+  color-scheme: light;
+  --bg: #eef1f7;
+  --surface: #ffffff;
+  --raised: #f4f6fb;
+  --line: #dce1ec;
+  --text: #151a2e;
+  --muted: #555d7a;
+  --faint: #8a91aa;
+  --accent: #5a47e0;
+  --accent-ink: #ffffff;
+  --accent-soft: #e6e2ff;
+  --good: #0a8a0a;
+  --warning: #9a6700;
+  --warning-mark: #fab219;
+  --critical: #c42f2f;
+  --critical-soft: #fde8e8;
+  --screen: #070a15;
+  --bezel: #1b2136;
+  /* categorical slots (validated: dataviz validator, light surface #fff) */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-other: #aab0c2;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #10152a;
+    --surface: #182038;
+    --raised: #202a47;
+    --line: #2c3658;
+    --text: #eef1f8;
+    --muted: #a3abc4;
+    --faint: #737c99;
+    --accent: #a494ff;
+    --accent-ink: #140f33;
+    --accent-soft: #2b2763;
+    --good: #3ccb52;
+    --warning: #fab219;
+    --warning-mark: #fab219;
+    --critical: #ff6b6b;
+    --critical-soft: #3a1c2a;
+    --screen: #05070f;
+    --bezel: #0a0e1c;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --series-5: #d55181;
+    --series-other: #5d6685;
+  }
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #10152a;
+  --surface: #182038;
+  --raised: #202a47;
+  --line: #2c3658;
+  --text: #eef1f8;
+  --muted: #a3abc4;
+  --faint: #737c99;
+  --accent: #a494ff;
+  --accent-ink: #140f33;
+  --accent-soft: #2b2763;
+  --good: #3ccb52;
+  --warning: #fab219;
+  --warning-mark: #fab219;
+  --critical: #ff6b6b;
+  --critical-soft: #3a1c2a;
+  --screen: #05070f;
+  --bezel: #0a0e1c;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-other: #5d6685;
+}
+
+@theme inline {
+  --font-sans: 'Rubik Variable', 'Rubik', ui-rounded, system-ui, sans-serif;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-good: var(--good);
+  --color-warning: var(--warning);
+  --color-critical: var(--critical);
+  --color-critical-soft: var(--critical-soft);
+  --color-screen: var(--screen);
+  --color-bezel: var(--bezel);
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  min-height: 100dvh;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* TV "no signal": static noise, no animation */
+.static-noise {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='90'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .75  0 0 0 0 .78  0 0 0 0 .86  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: cover;
+}
+
+/* Quiet-hours band in the schedule tracks */
+.hatch {
+  background-image: repeating-linear-gradient(135deg, currentColor 0 2px, transparent 2px 6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

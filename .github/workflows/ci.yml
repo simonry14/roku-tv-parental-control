@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Tests (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npx prettier --check .
+      - run: npm run check
+      - run: npm run build
+      - run: npm run channel:build
+
+  windows:
+    name: Windows build and installer scripts
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - name: The installer scripts parse in Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $failed = $false
+          foreach ($file in Get-ChildItem scripts\windows\*.ps1) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$tokens, [ref]$errors) | Out-Null
+            foreach ($e in $errors) {
+              Write-Host "$($file.Name):$($e.Extent.StartLineNumber): $($e.Message)"
+              $failed = $true
+            }
+          }
+          if ($failed) { exit 1 }
+          Write-Host 'All installer scripts parse.'
+      - name: The .cmd and .ps1 files keep Windows line endings
+        shell: pwsh
+        run: |
+          $bad = Get-ChildItem -Recurse -Include *.cmd, *.ps1 -Path . -Exclude node_modules |
+            Where-Object { $_.FullName -notmatch '\\node_modules\\' } |
+            Where-Object { (Get-Content $_.FullName -Raw) -match "[^`r]`n" }
+          if ($bad) { $bad | ForEach-Object { Write-Host "LF line endings: $($_.FullName)" }; exit 1 }

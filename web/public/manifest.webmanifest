@@ -1,0 +1,9 @@
+{
+  "name": "Roku TV Parental Control",
+  "short_name": "TV Control",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#10152a",
+  "theme_color": "#10152a",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

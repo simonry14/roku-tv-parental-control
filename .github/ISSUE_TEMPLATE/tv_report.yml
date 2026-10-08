@@ -1,0 +1,26 @@
+name: Works (or doesn't) on my TV
+description: Tell us which Roku TV or streaming player you tried it on.
+labels: [compatibility]
+body:
+  - type: input
+    id: tv
+    attributes:
+      label: TV or player
+      description: Brand and model, and the Roku OS version (Settings → System → About).
+      placeholder: TCL 55S455, Roku OS 14.1.4
+    validations:
+      required: true
+  - type: checkboxes
+    id: works
+    attributes:
+      label: What worked?
+      options:
+        - label: The installer found the TV
+        - label: Screen time was counted (dashboard → History)
+        - label: Blocked apps went back to Home
+        - label: The TV switched off at bedtime or with Lock TV
+        - label: Messages appeared on the TV (the Parental Control channel)
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else?

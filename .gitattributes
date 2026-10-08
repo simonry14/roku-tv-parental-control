@@ -1,0 +1,11 @@
+* text=auto eol=lf
+
+# Windows scripts keep their Windows line endings (and the .ps1 files their UTF-8 BOM) byte for byte.
+*.cmd -text
+*.ps1 -text
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.ttf binary
+*.zip binary
